@@ -10,7 +10,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
-	// "github.com/hashicorp/terraform-plugin-framework/types"
 )
 
 // Ensure JWKProvider satisfies various provider interfaces.
@@ -25,7 +24,7 @@ type JWKProvider struct {
 }
 
 // JWKProviderModel describes the provider data model.
-type JWKProviderModel struct {}
+type JWKProviderModel struct{}
 
 func (p *JWKProvider) Metadata(ctx context.Context, req provider.MetadataRequest, resp *provider.MetadataResponse) {
 	resp.TypeName = "jwk"
@@ -34,8 +33,7 @@ func (p *JWKProvider) Metadata(ctx context.Context, req provider.MetadataRequest
 
 func (p *JWKProvider) Schema(ctx context.Context, req provider.SchemaRequest, resp *provider.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		Attributes: map[string]schema.Attribute{
-		},
+		Attributes: map[string]schema.Attribute{},
 	}
 }
 
@@ -47,17 +45,10 @@ func (p *JWKProvider) Configure(ctx context.Context, req provider.ConfigureReque
 	if resp.Diagnostics.HasError() {
 		return
 	}
-
-	// // Example client configuration for data sources and resources
-	// client := http.DefaultClient
-	// resp.DataSourceData = client
-	// resp.ResourceData = client
 }
 
 func (p *JWKProvider) Resources(ctx context.Context) []func() resource.Resource {
-	return []func() resource.Resource{
-		NewExtractResource,
-	}
+	return []func() resource.Resource{}
 }
 
 func (p *JWKProvider) DataSources(ctx context.Context) []func() datasource.DataSource {

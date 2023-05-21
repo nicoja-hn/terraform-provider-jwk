@@ -13,8 +13,29 @@ Extract data source
 ## Example Usage
 
 ```terraform
+# RSA public key
 data "jwk_extract" "example" {
-  configurable_attribute = "some-value"
+  public_certificate = <<EOT
+-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtFDX9VMt532IwjTUDocJ
+SHPFg9BKOh0cq4ewDU4IfVt15ATorJZsidbKHySnaIeXNnT4ZxakMxRNRVnP5lSL
+rFce6AfyaogLs9EPzXqS26E4isPtNmBU0syeLksAeB3Mr3XwDdffIML3qmWG098q
+SDzMdEaT1cUZWZqx+BFQmYl4Lbf0YOQ4WSCFMo7/3d062htGMF8CQOJfZwFCj/IW
+2Q92S68hEf3ftR+PCYCKze383QLdmUcj+tBqa0tEqHf12FC2uJygnhMswdrREjEJ
+19AmvtDmISuwBHCMQYWhKEA5xb4fkm6JoYW4H0VL41tckOdYH7G918PmDmXEmkVk
+IwIDAQAB
+-----END PUBLIC KEY-----
+EOT
+}
+
+# ECDSA public key
+data "jwk_extract" "example" {
+  public_certificate = <<EOT
+-----BEGIN PUBLIC KEY-----
+MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE6GDI8fW9IHNg4kcUfmQ/5xZB3kKW
+wlIEoiwQPj4JkS72uOECKq/RiLP0T6niU83gkCaKJMvAyvtb4o4rb4AUYQ==
+-----END PUBLIC KEY-----
+EOT
 }
 ```
 
@@ -23,8 +44,11 @@ data "jwk_extract" "example" {
 
 ### Optional
 
-- `configurable_attribute` (String) Example configurable attribute
+- `public_certificate` (String) Example configurable attribute
 
 ### Read-Only
 
-- `id` (String) Example identifier
+- `id` (String) Example configurable attribute
+- `jwk` (String, Sensitive) Example configurable attribute
+
+

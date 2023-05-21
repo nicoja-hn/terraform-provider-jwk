@@ -1,4 +1,4 @@
-module terraform-provider-jwk
+module github.com/nicoja-hn/terraform-provider-jwk
 
 go 1.19
 
