@@ -4,7 +4,9 @@ repos:
       rev: v4.4.0
       hooks:
           - id: trailing-whitespace
+            exclude: docs/
           - id: end-of-file-fixer
+            exclude: docs/
           - id: check-docstring-first
           - id: check-case-conflict
           - id: check-merge-conflict
@@ -14,6 +16,12 @@ repos:
           - id: pretty-format-json
             args: [--autofix]
           - id: no-commit-to-branch
+
+    - repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
+      rev: v2.9.0
+      hooks:
+          - id: pretty-format-golang
+            args: [--autofix]
 
     - repo: https://github.com/zricethezav/gitleaks
       rev: v8.16.3
