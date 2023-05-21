@@ -1,0 +1,38 @@
+---
+repos:
+    - repo: https://github.com/pre-commit/pre-commit-hooks
+      rev: v4.4.0
+      hooks:
+          - id: trailing-whitespace
+          - id: end-of-file-fixer
+          - id: check-docstring-first
+          - id: check-case-conflict
+          - id: check-merge-conflict
+          - id: check-added-large-files
+          - id: check-yaml
+          - id: check-json
+          - id: pretty-format-json
+            args: [--autofix]
+          - id: no-commit-to-branch
+
+    - repo: https://github.com/zricethezav/gitleaks
+      rev: v8.16.3
+      hooks:
+          - id: gitleaks
+
+    - repo: https://github.com/myint/docformatter
+      rev: v1.7.1
+      hooks:
+          - id: docformatter
+            args: [--in-place]
+
+    - repo: https://github.com/jumanjihouse/pre-commit-hook-yamlfmt
+      rev: 0.2.3
+      hooks:
+          - id: yamlfmt
+
+    - repo: https://github.com/antonbabenko/pre-commit-terraform
+      rev: v1.79.1
+      hooks:
+          - id: terraform_fmt
+          - id: terraform_docs
