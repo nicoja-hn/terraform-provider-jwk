@@ -1,4 +1,4 @@
-module terraform-provider-jwk
+module github.com/nicoja-hn/terraform-provider-jwk
 
 go 1.19
 
@@ -8,6 +8,8 @@ require (
 	github.com/hashicorp/terraform-plugin-go v0.15.0
 	github.com/hashicorp/terraform-plugin-log v0.8.0
 	github.com/hashicorp/terraform-plugin-testing v1.2.0
+	github.com/pkg/errors v0.9.1
+	gopkg.in/square/go-jose.v2 v2.6.0
 )
 
 require (
