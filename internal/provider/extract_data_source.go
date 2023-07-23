@@ -7,9 +7,12 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"regexp"
 
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	// "github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -29,6 +32,7 @@ type ExtractDataSource struct {
 // ExtractDataSourceModel describes the data source data model.
 type ExtractDataSourceModel struct {
 	PublicCertificate types.String `tfsdk:"public_certificate"`
+	SigningAlgorithm  types.String `tfsdk:"signing_algorithm"`
 	Jwk               types.String `tfsdk:"jwk"`
 	Id                types.String `tfsdk:"id"`
 }
@@ -45,7 +49,20 @@ func (d *ExtractDataSource) Schema(ctx context.Context, req datasource.SchemaReq
 		Attributes: map[string]schema.Attribute{
 			"public_certificate": schema.StringAttribute{
 				MarkdownDescription: "Example configurable attribute",
-				Optional:            true,
+				Required:            true,
+			},
+			"signing_algorithm": schema.StringAttribute{
+				MarkdownDescription: "Example configurable attribute",
+				Required:            true,
+				Validators: []validator.String{
+					// These are example validators from terraform-plugin-framework-validators
+					// stringvalidator.LengthBetween(0, 6),
+					// stringvalidator.OneOfCaseInsensitive("rs256"),
+					stringvalidator.RegexMatches(
+						regexp.MustCompile(`^(r|R|e|E)(s|S)(256|384|512)$`),
+						"must contain only lowercase alphanumeric characters",
+					),
+				},
 			},
 			"jwk": schema.StringAttribute{
 				MarkdownDescription: "Example configurable attribute",

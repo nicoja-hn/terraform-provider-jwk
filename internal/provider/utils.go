@@ -49,21 +49,37 @@ func readKey(content string) ([]byte, error) {
 	if err != nil {
 		return response, errors.Wrapf(err, "Error parsing key content")
 	}
-	switch pubKey.(type) {
-	case *rsa.PublicKey:
-	case *ecdsa.PublicKey:
-	default:
-		return response, fmt.Errorf("Public key was not RSA or ECDSA, but %T", pubKey)
-	}
 
 	var alg jose.SignatureAlgorithm
 	switch pubKey.(type) {
 	case *rsa.PublicKey:
 		alg = jose.RS256
+		alg = jose.RS384
+		alg = jose.RS512
+		// Note: Could potentially allow for different signing algorithms
+		// 		 needs bit-length checking
+		// var bitLen = pubKey.N.BitLen()
 	case *ecdsa.PublicKey:
-		alg = jose.ES256
+		// Note: Possible alternative to go via bit-size
+		// pubKey.Curve.Params().BitSize()
+		// Ref: https://stackoverflow.com/a/42718174
+		// var bitLen = pubKey.(*ecdsa.PublicKey).Curve.Params().BitSize
+
+		// Canonical names: P-224, P-256, P-384, P-521
+		// pubKey.Curve.Params().Name()
+		switch pubKey.(*ecdsa.PublicKey).Curve.Params().Name {
+		case "P-256":
+			alg = jose.ES256
+		case "P-384":
+			alg = jose.ES384
+		case "P-521":
+			alg = jose.ES512
+		default:
+			// Note: P-224 can't be used due to too short length
+			return response, fmt.Errorf("ECDSA public key should be either P256, P382, P521, but is %T", pubKey.(*ecdsa.PublicKey).Curve.Params().Name)
+		}
 	default:
-		return response, fmt.Errorf("invalid public key type %T, must be *rsa.PrivateKey or *ecdsa.PublicKey", pubKey)
+		return response, fmt.Errorf("Public key was not RSA or ECDSA, but %T", pubKey)
 	}
 
 	kid, err := keyIDFromPublicKey(pubKey)

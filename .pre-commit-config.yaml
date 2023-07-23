@@ -7,7 +7,7 @@ repos:
             exclude: docs/
           - id: end-of-file-fixer
             exclude: docs/
-          - id: check-docstring-first
+          # - id: check-docstring-first
           - id: check-case-conflict
           - id: check-merge-conflict
           - id: check-added-large-files
@@ -16,6 +16,33 @@ repos:
           - id: pretty-format-json
             args: [--autofix]
           - id: no-commit-to-branch
+
+    - repo: https://github.com/syntaqx/git-hooks
+      rev: v0.0.18
+      hooks:
+          # - id: circleci-config-validate
+          # - id: forbid-binary
+          - id: go-fmt
+          - id: go-test
+          - id: go-mod-tidy
+          - id: go-generate
+          # - id: shellcheck
+          # - id: shfmt
+
+    # - repo: https://github.com/troian/pre-commit-golang
+    #   sha: HEAD
+    #   hooks:
+    #       - id: go-fmt
+    #       - id: go-vet
+    #       - id: go-build
+    #       - id: go-metalinter
+    #         args:
+    #             - --exclude=corefoundation.go
+    #             - --deadline=60s
+    #             - --vendor
+    #             - --cyclo-over=20
+    #             - --dupl-threshold=100
+    #             - --disable=gotype
 
     - repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
       rev: v2.9.0
@@ -28,11 +55,11 @@ repos:
       hooks:
           - id: gitleaks
 
-    - repo: https://github.com/myint/docformatter
-      rev: v1.7.1
-      hooks:
-          - id: docformatter
-            args: [--in-place]
+    # - repo: https://github.com/myint/docformatter
+    #   rev: v1.7.1
+    #   hooks:
+    #       - id: docformatter
+    #         args: [--in-place]
 
     - repo: https://github.com/jumanjihouse/pre-commit-hook-yamlfmt
       rev: 0.2.3

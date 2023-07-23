@@ -62,3 +62,32 @@ In order to run the full suite of Acceptance tests, run `make testacc`.
 ```shell
 make testacc
 ```
+
+```bash
+go install
+```
+
+```bash
+go build -o  ~/.terraform.d/plugins/registry.terraform.io/nicoja-hn/jwk/1.0.0/darwin_arm64/terraform-provider-jwk
+```
+
+* [Provider installation](https://developer.hashicorp.com/terraform/cli/config/config-file#provider-installation): `~/.terraformrc`
+```
+provider_installation {
+  # This disables the version and checksum
+  # verifications for this provider and forces Terraform to look for the
+  # null provider plugin in the given directory.
+  dev_overrides {
+    "nicoja-hn/jwk" = "/Users/nicojahn/.terraform.d/plugins/registry.terraform.io/nicoja-hn/jwk/1.0.0/darwin_arm64"
+  }
+
+  direct {
+    exclude = ["nicoja-hn/*"]
+  }
+
+  filesystem_mirror {
+    path    = "/Users/nicojahn/.terraform.d/plugins"
+    include = ["nicoja-hn/*"]
+  }
+}
+```

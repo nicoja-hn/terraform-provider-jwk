@@ -27,6 +27,7 @@ func TestAccExtractDataSource(t *testing.T) {
 
 const testAccExtractDataSourceConfig = `
 data "jwk_extract" "test" {
+	signing_algorithm = "ES256"
 	public_certificate = <<EOT
 -----BEGIN PUBLIC KEY-----
 MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE6GDI8fW9IHNg4kcUfmQ/5xZB3kKW
