@@ -29,6 +29,7 @@ type ExtractDataSource struct {
 // ExtractDataSourceModel describes the data source data model.
 type ExtractDataSourceModel struct {
 	PublicCertificate types.String `tfsdk:"public_certificate"`
+	SigningAlgorithm  types.String `tfsdk:"signing_algorithm"`
 	Jwk               types.String `tfsdk:"jwk"`
 	Id                types.String `tfsdk:"id"`
 }
@@ -45,7 +46,11 @@ func (d *ExtractDataSource) Schema(ctx context.Context, req datasource.SchemaReq
 		Attributes: map[string]schema.Attribute{
 			"public_certificate": schema.StringAttribute{
 				MarkdownDescription: "Example configurable attribute",
-				Optional:            true,
+				Optional:            false,
+			},
+			"signing_algorithm": schema.StringAttribute{
+				MarkdownDescription: "Example configurable attribute",
+				Optional:            false,
 			},
 			"jwk": schema.StringAttribute{
 				MarkdownDescription: "Example configurable attribute",

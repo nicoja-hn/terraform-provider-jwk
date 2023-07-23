@@ -62,3 +62,11 @@ In order to run the full suite of Acceptance tests, run `make testacc`.
 ```shell
 make testacc
 ```
+
+```bash
+go install
+```
+
+```bash
+cp dist/jwk_darwin_arm64/jwk_v0.0.0-SNAPSHOT-* /Users/nicojahn/.terraform.d/plugins/registry.terraform.io/nicoja-hn/jwk/1.0.0/darwin_arm64/terraform-provider-jwk
+```
