@@ -5,7 +5,9 @@ This guide shows you how to develop and test the provider locally.
 ## Prerequisites
 
 - [Go](https://golang.org/doc/install) >= 1.24
-- [Terraform](https://www.terraform.io/downloads.html) >= 1.0
+- [Terraform](https://www.terraform.io/downloads.html) >= 1.0 or [OpenTofu](https://opentofu.org/docs/intro/install/) >= 1.6
+
+**Note:** This provider works with both Terraform and OpenTofu. Throughout this guide, you can replace `terraform` commands with `tofu` commands.
 
 ## 1. Build the Provider Locally
 
@@ -26,7 +28,9 @@ This installs the provider in `$GOPATH/bin`.
 
 ### Option B: Manual Installation with Development Override
 
-Create or edit `~/.terraformrc` (Linux/Mac) or `%APPDATA%\terraform.rc` (Windows):
+Create or edit the CLI configuration file:
+- **Terraform**: `~/.terraformrc` (Linux/Mac) or `%APPDATA%\terraform.rc` (Windows)
+- **OpenTofu**: `~/.tofurc` (Linux/Mac) or `%APPDATA%\tofu.rc` (Windows)
 
 ```hcl
 provider_installation {
@@ -41,7 +45,10 @@ provider_installation {
 
 Replace `/path/to/terraform-provider-jwk` with the absolute path to your project directory.
 
-**Important:** With dev_overrides, Terraform ignores the `required_providers` version - you must manually rebuild the provider when you make changes.
+**Important Notes about dev_overrides:**
+- Terraform/OpenTofu ignores the `required_providers` version - you must manually rebuild the provider when you make changes
+- **Skip `terraform init` / `tofu init`** when using dev_overrides - go directly to `plan` or `apply`
+- The init command will try to download from the registry and may fail, but this is expected and can be ignored
 
 ## 3. Create Test Configuration
 
@@ -75,10 +82,34 @@ resource "jwk_example" "test" {
 }
 ```
 
-## 4. Initialize and Run Terraform
+## 4. Run Terraform/OpenTofu
+
+### With dev_overrides (Recommended for Development)
 
 ```bash
-# Initialize Terraform
+# SKIP init when using dev_overrides!
+# The provider is already available locally
+
+# Show plan
+terraform plan
+# or with OpenTofu:
+tofu plan
+
+# Apply changes
+terraform apply
+# or with OpenTofu:
+tofu apply
+
+# Clean up
+terraform destroy
+# or with OpenTofu:
+tofu destroy
+```
+
+### Without dev_overrides (Standard Installation)
+
+```bash
+# Initialize Terraform/OpenTofu
 terraform init
 
 # Show plan
@@ -90,6 +121,8 @@ terraform apply
 # Clean up
 terraform destroy
 ```
+
+**Note:** If you see an error during `init` about the provider not being found in the registry while using dev_overrides, that's expected - just skip `init` and go directly to `plan`/`apply`.
 
 ## 5. Run Provider Tests
 
