@@ -11,6 +11,21 @@ This guide shows you how to develop and test the provider locally.
 
 ## 1. Build the Provider Locally
 
+### Using Make (Recommended)
+
+```bash
+# See all available commands
+make help
+
+# Build for local development with dev_overrides
+make install-local
+
+# Build and install to Terraform plugin directory
+make install
+```
+
+### Using Go directly
+
 ```bash
 # In the project directory
 go build -o terraform-provider-jwk
@@ -18,7 +33,18 @@ go build -o terraform-provider-jwk
 
 ## 2. Install Provider for Local Development
 
-### Option A: Using `go install`
+### Option A: Using Make (Recommended)
+
+```bash
+# Install to Terraform plugin directory
+make install
+
+# This installs to: ~/.terraform.d/plugins/registry.terraform.io/nicoja-hn/jwk/1.0.0/<os>_<arch>/
+```
+
+After installation, **remove dev_overrides** from your config file and run `terraform init` or `tofu init`.
+
+### Option B: Using `go install`
 
 ```bash
 go install
@@ -26,7 +52,7 @@ go install
 
 This installs the provider in `$GOPATH/bin`.
 
-### Option B: Manual Installation with Development Override
+### Option C: Manual Installation with Development Override
 
 Create or edit the CLI configuration file:
 - **Terraform**: `~/.terraformrc` (Linux/Mac) or `%APPDATA%\terraform.rc` (Windows)
