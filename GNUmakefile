@@ -29,9 +29,46 @@ install: build ## Build and install provider to Terraform plugin directory
 	@cp $(BINARY_NAME) $(PLUGIN_DIR)/
 	@echo "Provider installed successfully!"
 	@echo ""
-	@echo "To use this installation:"
-	@echo "  1. Remove or comment out dev_overrides from ~/.terraformrc or ~/.tofurc"
-	@echo "  2. Run: terraform init (or tofu init)"
+	@echo "Creating configuration file..."
+	@$(MAKE) -s create-config
+	@echo ""
+	@echo "Installation complete! To use the provider:"
+	@echo "  1. Run: terraform init (or tofu init)"
+	@echo "  2. Then: terraform plan (or tofu plan)"
+
+.PHONY: create-config
+create-config: ## Create or update Terraform/OpenTofu config file
+	@echo "Checking for Terraform/OpenTofu config..."
+	@if command -v tofu >/dev/null 2>&1; then \
+		CONFIG_FILE="$(HOME)/.tofurc"; \
+		echo "OpenTofu detected, creating $$CONFIG_FILE"; \
+	elif command -v terraform >/dev/null 2>&1; then \
+		CONFIG_FILE="$(HOME)/.terraformrc"; \
+		echo "Terraform detected, creating $$CONFIG_FILE"; \
+	else \
+		CONFIG_FILE="$(HOME)/.terraformrc"; \
+		echo "Creating default config at $$CONFIG_FILE"; \
+	fi; \
+	if [ -f "$$CONFIG_FILE" ]; then \
+		echo "Backing up existing config to $$CONFIG_FILE.backup"; \
+		cp "$$CONFIG_FILE" "$$CONFIG_FILE.backup"; \
+	fi; \
+	echo "provider_installation {" > "$$CONFIG_FILE"; \
+	echo "  dev_overrides {" >> "$$CONFIG_FILE"; \
+	echo "    \"$(NAMESPACE)/$(PROVIDER_NAME)\" = \"$(PLUGIN_DIR)\"" >> "$$CONFIG_FILE"; \
+	echo "  }" >> "$$CONFIG_FILE"; \
+	echo "" >> "$$CONFIG_FILE"; \
+	echo "  # For all other providers, use the normal registry" >> "$$CONFIG_FILE"; \
+	echo "  direct {" >> "$$CONFIG_FILE"; \
+	echo "    exclude = [\"$(NAMESPACE)/*\"]" >> "$$CONFIG_FILE"; \
+	echo "  }" >> "$$CONFIG_FILE"; \
+	echo "" >> "$$CONFIG_FILE"; \
+	echo "  filesystem_mirror {" >> "$$CONFIG_FILE"; \
+	echo "    path    = \"$(HOME)/.terraform.d/plugins\"" >> "$$CONFIG_FILE"; \
+	echo "    include = [\"$(NAMESPACE)/*\"]" >> "$$CONFIG_FILE"; \
+	echo "  }" >> "$$CONFIG_FILE"; \
+	echo "}" >> "$$CONFIG_FILE"; \
+	echo "Config file created/updated: $$CONFIG_FILE"
 
 .PHONY: install-local
 install-local: ## Build for dev_overrides (in current directory)
@@ -82,3 +119,23 @@ show-paths: ## Show installation paths
 	@echo "Plugin directory: $(PLUGIN_DIR)"
 	@echo "Binary name: $(BINARY_NAME)"
 	@echo "Current directory: $(shell pwd)"
+
+.PHONY: show-config
+show-config: ## Show what the config file would contain
+	@echo "Configuration that will be created:"
+	@echo ""
+	@echo "provider_installation {"
+	@echo "  dev_overrides {"
+	@echo "    \"$(NAMESPACE)/$(PROVIDER_NAME)\" = \"$(PLUGIN_DIR)\""
+	@echo "  }"
+	@echo ""
+	@echo "  # For all other providers, use the normal registry"
+	@echo "  direct {"
+	@echo "    exclude = [\"$(NAMESPACE)/*\"]"
+	@echo "  }"
+	@echo ""
+	@echo "  filesystem_mirror {"
+	@echo "    path    = \"$(HOME)/.terraform.d/plugins\""
+	@echo "    include = [\"$(NAMESPACE)/*\"]"
+	@echo "  }"
+	@echo "}"

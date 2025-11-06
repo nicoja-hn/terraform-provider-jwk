@@ -78,7 +78,7 @@ Replace `/path/to/terraform-provider-jwk` with the absolute path to your project
 
 ## 3. Create Test Configuration
 
-Create a file `test.tf`:
+You can use the examples from the `examples/` directory, or create your own `test.tf`:
 
 ```hcl
 terraform {
@@ -93,20 +93,29 @@ provider "jwk" {
   # Provider configuration here
 }
 
-# Example Data Source
+# Note: Currently using scaffolding/example resources
+# Real JWK resources need to be implemented
+
+# Example Data Source (placeholder)
 data "jwk_example" "test" {
-  configurable_attribute = "test"
+  configurable_attribute = "test-value"
 }
 
-output "example_output" {
-  value = data.jwk_example.test
-}
-
-# Example Resource
+# Example Resource (placeholder)
 resource "jwk_example" "test" {
-  configurable_attribute = "test"
+  configurable_attribute = "test-value"
+}
+
+output "data_source_id" {
+  value = data.jwk_example.test.id
+}
+
+output "resource_id" {
+  value = jwk_example.test.id
 }
 ```
+
+**Note:** The provider currently contains scaffolding resources (`jwk_example`). For real JWK functionality, see the planned resources in `examples/README.md`.
 
 ## 4. Run Terraform/OpenTofu
 

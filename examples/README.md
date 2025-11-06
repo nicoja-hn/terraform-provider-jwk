@@ -1,9 +1,65 @@
-# Examples
+# Example Quick Start Guide
 
-This directory contains examples that are mostly used for documentation, but can also be run/tested manually via the Terraform CLI.
+This directory contains example Terraform configurations for the JWK provider.
 
-The document generation tool looks for files in the following locations by default. All other *.tf files besides the ones mentioned below are ignored by the documentation tool. This is useful for creating examples that can run and/or ar testable even if some parts are not relevant for the documentation.
+## Current Status
 
-* **provider/provider.tf** example file for the provider index page
-* **data-sources/`full data source name`/data-source.tf** example file for the named data source page
-* **resources/`full resource name`/resource.tf** example file for the named data source page
+⚠️ **Note**: The provider currently contains scaffolding/example resources (`jwk_example`) as placeholders. Real JWK functionality needs to be implemented.
+
+## Using the Examples
+
+### 1. Basic Provider Setup
+
+See `provider/provider.tf` for the basic provider configuration.
+
+### 2. Testing Locally
+
+If you're developing the provider locally:
+
+```bash
+# Build and install the provider
+cd /path/to/terraform-provider-jwk
+make install
+
+# Navigate to an example
+cd examples/provider
+
+# Initialize and plan (or just plan if using dev_overrides)
+terraform plan
+terraform apply
+```
+
+## Planned JWK Resources (To Be Implemented)
+
+The following resources would be typical for a JWK provider:
+
+### Resources
+
+- `jwk_rsa_key` - Generate RSA key pairs as JWK
+- `jwk_ec_key` - Generate Elliptic Curve key pairs as JWK
+- `jwk_symmetric_key` - Generate symmetric keys as JWK
+- `jwk_key_set` - Manage JWK Sets (JWKS)
+
+### Data Sources
+
+- `jwk_key_set` - Read JWK Set from a URL or file
+- `jwk_public_key` - Extract public key from a JWK
+
+### Example Use Cases
+
+1. **Generate signing keys for JWT tokens**
+2. **Rotate keys automatically**
+3. **Manage key sets for multiple environments**
+4. **Import existing keys**
+5. **Export public keys for verification**
+
+## Contributing
+
+To implement real JWK resources:
+
+1. Review the scaffolding in `internal/provider/example_resource.go`
+2. Create new resource files like `internal/provider/rsa_key_resource.go`
+3. Implement the JWK generation/management logic
+4. Update these examples with real usage
+
+See `TESTING.md` in the repository root for development guidelines.
