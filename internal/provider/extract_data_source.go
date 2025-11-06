@@ -65,12 +65,7 @@ func (d *ExtractDataSource) Schema(ctx context.Context, req datasource.SchemaReq
 				},
 			},
 			"jwk": schema.StringAttribute{
-				MarkdownDescription: "Example configurable attribute",
-				Computed:            true,
-				Sensitive:           true,
-			},
-			"jwk": schema.StringAttribute{
-				MarkdownDescription: "Example configurable attribute",
+				MarkdownDescription: "The public key in JWK format",
 				Computed:            true,
 				Sensitive:           true,
 			},
