@@ -36,13 +36,21 @@ go build -o terraform-provider-jwk
 ### Option A: Using Make (Recommended)
 
 ```bash
-# Install to Terraform plugin directory
+# Install to plugin directory and create config
 make install
 
-# This installs to: ~/.terraform.d/plugins/registry.terraform.io/nicoja-hn/jwk/1.0.0/<os>_<arch>/
+# This automatically:
+# - Detects OpenTofu or Terraform
+# - Installs to correct registry path (registry.opentofu.org or registry.terraform.io)
+# - Creates ~/.tofurc or ~/.terraformrc with filesystem_mirror config
+# - Backs up existing config to .backup file
 ```
 
-After installation, **remove dev_overrides** from your config file and run `terraform init` or `tofu init`.
+**Installation paths:**
+- OpenTofu: `~/.terraform.d/plugins/registry.opentofu.org/nicoja-hn/jwk/1.0.0/<os>_<arch>/`
+- Terraform: `~/.terraform.d/plugins/registry.terraform.io/nicoja-hn/jwk/1.0.0/<os>_<arch>/`
+
+After installation, you can use `terraform init` or `tofu init` normally! ✅
 
 ### Option B: Using `go install`
 
@@ -52,29 +60,48 @@ go install
 
 This installs the provider in `$GOPATH/bin`.
 
-### Option C: Manual Installation with Development Override
+### Option C: Manual Filesystem Mirror Setup
 
-Create or edit the CLI configuration file:
-- **Terraform**: `~/.terraformrc` (Linux/Mac) or `%APPDATA%\terraform.rc` (Windows)
-- **OpenTofu**: `~/.tofurc` (Linux/Mac) or `%APPDATA%\tofu.rc` (Windows)
+If you prefer manual setup or need custom configuration:
 
+**For OpenTofu (`~/.tofurc`):**
 ```hcl
 provider_installation {
-  dev_overrides {
-    "nicoja-hn/jwk" = "/path/to/terraform-provider-jwk"
+  # For all other providers, use the normal registry
+  direct {
+    exclude = ["nicoja-hn/*"]
   }
 
-  # For all other providers, use the normal registry
-  direct {}
+  filesystem_mirror {
+    path    = "/Users/yourusername/.terraform.d/plugins"
+    include = ["nicoja-hn/*"]
+  }
 }
 ```
 
-Replace `/path/to/terraform-provider-jwk` with the absolute path to your project directory.
+**For Terraform (`~/.terraformrc`):**
+```hcl
+provider_installation {
+  # For all other providers, use the normal registry
+  direct {
+    exclude = ["nicoja-hn/*"]
+  }
 
-**Important Notes about dev_overrides:**
-- Terraform/OpenTofu ignores the `required_providers` version - you must manually rebuild the provider when you make changes
-- **Skip `terraform init` / `tofu init`** when using dev_overrides - go directly to `plan` or `apply`
-- The init command will try to download from the registry and may fail, but this is expected and can be ignored
+  filesystem_mirror {
+    path    = "/Users/yourusername/.terraform.d/plugins"
+    include = ["nicoja-hn/*"]
+  }
+}
+```
+
+Then manually copy the provider binary to:
+- OpenTofu: `~/.terraform.d/plugins/registry.opentofu.org/nicoja-hn/jwk/1.0.0/<os>_<arch>/terraform-provider-jwk_v1.0.0`
+- Terraform: `~/.terraform.d/plugins/registry.terraform.io/nicoja-hn/jwk/1.0.0/<os>_<arch>/terraform-provider-jwk_v1.0.0`
+
+**Benefits of filesystem_mirror over dev_overrides:**
+- ✅ You can use `terraform init` / `tofu init` normally
+- ✅ Works with complex setups (remote backends, multiple providers)
+- ✅ No warnings about development overrides
 
 ## 3. Create Test Configuration
 
@@ -123,11 +150,13 @@ See `examples/README.md` for more detailed usage examples.
 
 ## 4. Run Terraform/OpenTofu
 
-### With dev_overrides (Recommended for Development)
+### With filesystem_mirror (Recommended - from `make install`)
 
 ```bash
-# SKIP init when using dev_overrides!
-# The provider is already available locally
+# Initialize - this works! ✅
+terraform init
+# or with OpenTofu:
+tofu init
 
 # Show plan
 terraform plan
@@ -145,23 +174,11 @@ terraform destroy
 tofu destroy
 ```
 
-### Without dev_overrides (Standard Installation)
-
-```bash
-# Initialize Terraform/OpenTofu
-terraform init
-
-# Show plan
-terraform plan
-
-# Apply changes
-terraform apply
-
-# Clean up
-terraform destroy
-```
-
-**Note:** If you see an error during `init` about the provider not being found in the registry while using dev_overrides, that's expected - just skip `init` and go directly to `plan`/`apply`.
+**This works because:**
+- Provider is in the correct registry path
+- `filesystem_mirror` tells Terraform/OpenTofu to check local plugins first
+- `direct` with `exclude` prevents attempts to download from remote registry
+- You can use all standard Terraform/OpenTofu workflows!
 
 ## 5. Run Provider Tests
 

@@ -5,8 +5,16 @@ PROVIDER_NAME := jwk
 NAMESPACE := nicoja-hn
 VERSION := 1.0.0
 
+# Detect if OpenTofu or Terraform is being used
+HAS_TOFU := $(shell command -v tofu 2> /dev/null)
+ifdef HAS_TOFU
+    REGISTRY := registry.opentofu.org
+else
+    REGISTRY := registry.terraform.io
+endif
+
 # Installation paths
-PLUGIN_DIR := $(HOME)/.terraform.d/plugins/registry.terraform.io/$(NAMESPACE)/$(PROVIDER_NAME)/$(VERSION)/$(OS)_$(ARCH)
+PLUGIN_DIR := $(HOME)/.terraform.d/plugins/$(REGISTRY)/$(NAMESPACE)/$(PROVIDER_NAME)/$(VERSION)/$(OS)_$(ARCH)
 BINARY_NAME := terraform-provider-$(PROVIDER_NAME)_v$(VERSION)
 
 default: testacc
@@ -41,12 +49,15 @@ create-config: ## Create or update Terraform/OpenTofu config file
 	@echo "Checking for Terraform/OpenTofu config..."
 	@if command -v tofu >/dev/null 2>&1; then \
 		CONFIG_FILE="$(HOME)/.tofurc"; \
-		echo "OpenTofu detected, creating $$CONFIG_FILE"; \
+		REGISTRY="registry.opentofu.org"; \
+		echo "OpenTofu detected, creating $$CONFIG_FILE for registry.opentofu.org"; \
 	elif command -v terraform >/dev/null 2>&1; then \
 		CONFIG_FILE="$(HOME)/.terraformrc"; \
-		echo "Terraform detected, creating $$CONFIG_FILE"; \
+		REGISTRY="registry.terraform.io"; \
+		echo "Terraform detected, creating $$CONFIG_FILE for registry.terraform.io"; \
 	else \
 		CONFIG_FILE="$(HOME)/.terraformrc"; \
+		REGISTRY="registry.terraform.io"; \
 		echo "Creating default config at $$CONFIG_FILE"; \
 	fi; \
 	if [ -f "$$CONFIG_FILE" ]; then \
@@ -54,10 +65,6 @@ create-config: ## Create or update Terraform/OpenTofu config file
 		cp "$$CONFIG_FILE" "$$CONFIG_FILE.backup"; \
 	fi; \
 	echo "provider_installation {" > "$$CONFIG_FILE"; \
-	echo "  dev_overrides {" >> "$$CONFIG_FILE"; \
-	echo "    \"$(NAMESPACE)/$(PROVIDER_NAME)\" = \"$(PLUGIN_DIR)\"" >> "$$CONFIG_FILE"; \
-	echo "  }" >> "$$CONFIG_FILE"; \
-	echo "" >> "$$CONFIG_FILE"; \
 	echo "  # For all other providers, use the normal registry" >> "$$CONFIG_FILE"; \
 	echo "  direct {" >> "$$CONFIG_FILE"; \
 	echo "    exclude = [\"$(NAMESPACE)/*\"]" >> "$$CONFIG_FILE"; \
@@ -68,7 +75,10 @@ create-config: ## Create or update Terraform/OpenTofu config file
 	echo "    include = [\"$(NAMESPACE)/*\"]" >> "$$CONFIG_FILE"; \
 	echo "  }" >> "$$CONFIG_FILE"; \
 	echo "}" >> "$$CONFIG_FILE"; \
-	echo "Config file created/updated: $$CONFIG_FILE"
+	echo "Config file created/updated: $$CONFIG_FILE"; \
+	echo ""; \
+	echo "Using registry: $$REGISTRY"; \
+	echo "Provider installed at: $(PLUGIN_DIR)"
 
 .PHONY: install-local
 install-local: ## Build for dev_overrides (in current directory)
@@ -125,10 +135,6 @@ show-config: ## Show what the config file would contain
 	@echo "Configuration that will be created:"
 	@echo ""
 	@echo "provider_installation {"
-	@echo "  dev_overrides {"
-	@echo "    \"$(NAMESPACE)/$(PROVIDER_NAME)\" = \"$(PLUGIN_DIR)\""
-	@echo "  }"
-	@echo ""
 	@echo "  # For all other providers, use the normal registry"
 	@echo "  direct {"
 	@echo "    exclude = [\"$(NAMESPACE)/*\"]"
@@ -139,3 +145,12 @@ show-config: ## Show what the config file would contain
 	@echo "    include = [\"$(NAMESPACE)/*\"]"
 	@echo "  }"
 	@echo "}"
+	@echo ""
+	@echo "Provider will be installed to:"
+	@echo "  $(PLUGIN_DIR)"
+	@echo ""
+	@if command -v tofu >/dev/null 2>&1; then \
+		echo "Registry: registry.opentofu.org (OpenTofu detected)"; \
+	else \
+		echo "Registry: registry.terraform.io (Terraform detected)"; \
+	fi
